@@ -1,6 +1,6 @@
 # Hydropass-SAM
 
-Serverless backend that you can deploy with the AWS Serverless Application Model (AWS SAM) command line interface (CLI). It includes the following files and folders:
+Serverless backend deployed with the AWS SAM CLI. It includes the following files and folders:
 
 - `src` - Code for the application's Lambda functions.
 - `events` - Invocation events that you can use to invoke the functions.
@@ -8,7 +8,7 @@ Serverless backend that you can deploy with the AWS Serverless Application Model
 - `templates` - Nested templates referenced in the main SAM template.yaml file.
 - `template.yaml` - The main SAM template that defines the application's AWS resources.
 
-If you prefer to use an integrated development environment (IDE) to build and test your application, you can use the AWS Toolkit extension, [available in VS Code](https://docs.aws.amazon.com/toolkit-for-vscode/latest/userguide/welcome.html).
+If you prefer to use an IDE to build and test your application, you can use the AWS Toolkit, [available in VS Code](https://docs.aws.amazon.com/toolkit-for-vscode/latest/userguide/welcome.html).
 
 ## Sync your application to the cloud
 
