@@ -1,4 +1,4 @@
-# hydropass-sam-app
+# Hydropass-SAM
 
 Serverless backend that you can deploy with the AWS Serverless Application Model (AWS SAM) command line interface (CLI). It includes the following files and folders:
 
