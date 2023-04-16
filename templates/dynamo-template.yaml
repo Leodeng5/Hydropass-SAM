@@ -1,0 +1,184 @@
+Parameters:
+  DefaultReadCapacity:
+    Type: Number
+    Default: 5
+    Description: The default provisioned read capacity for DynamoDB tables
+  DefaultWriteCapacity:
+    Type: Number
+    Default: 5
+    Description: The default provisioned write capacity for DynamoDB tables
+
+Resources:
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: HydropassUsersTable
+      KeySchema:
+        - AttributeName: user_id
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: user_id
+          AttributeType: S
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref DefaultReadCapacity
+        WriteCapacityUnits: !Ref DefaultWriteCapacity
+
+  ListingsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: HydropassListingsTable
+      KeySchema:
+        - AttributeName: host_id
+          KeyType: "HASH"
+        - AttributeName: listing_id
+          KeyType: "RANGE"
+      AttributeDefinitions:
+        - AttributeName: host_id
+          AttributeType: S
+        - AttributeName: listing_id
+          AttributeType: S
+        - AttributeName: location
+          AttributeType: S
+      GlobalSecondaryIndexes:
+        - IndexName: ListingLocationIndex
+          KeySchema:
+            - AttributeName: location
+              KeyType: HASH
+            - AttributeName: listing_id
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: !Ref DefaultReadCapacity
+            WriteCapacityUnits: !Ref DefaultWriteCapacity
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref DefaultReadCapacity
+        WriteCapacityUnits: !Ref DefaultWriteCapacity
+
+  BookingsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: HydropassBookingsTable
+      KeySchema:
+        - AttributeName: user_id
+          KeyType: HASH
+        - AttributeName: booking_id
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: user_id
+          AttributeType: S
+        - AttributeName: booking_id
+          AttributeType: S
+        - AttributeName: listing_id
+          AttributeType: S
+        - AttributeName: start_time
+          AttributeType: N
+      GlobalSecondaryIndexes:
+        - IndexName: BookingListingIndex
+          KeySchema:
+            - AttributeName: listing_id
+              KeyType: HASH
+            - AttributeName: start_time
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: !Ref DefaultReadCapacity
+            WriteCapacityUnits: !Ref DefaultWriteCapacity
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref DefaultReadCapacity
+        WriteCapacityUnits: !Ref DefaultWriteCapacity
+
+  ReviewsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: HydropassReviewsTable
+      KeySchema:
+        - AttributeName: listing_id
+          KeyType: HASH
+        - AttributeName: review_id
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: listing_id
+          AttributeType: S
+        - AttributeName: review_id
+          AttributeType: S
+        - AttributeName: user_id
+          AttributeType: S
+      GlobalSecondaryIndexes:
+        - IndexName: ReviewUserIndex
+          KeySchema:
+            - AttributeName: user_id
+              KeyType: HASH
+            - AttributeName: review_id
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: !Ref DefaultReadCapacity
+            WriteCapacityUnits: !Ref DefaultWriteCapacity
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref DefaultReadCapacity
+        WriteCapacityUnits: !Ref DefaultWriteCapacity
+
+  ChannelsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: HydropassChannelsTable
+      KeySchema:
+        - AttributeName: listing_id
+          KeyType: HASH
+        - AttributeName: channel_id
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: listing_id
+          AttributeType: S
+        - AttributeName: channel_id
+          AttributeType: S
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref DefaultReadCapacity
+        WriteCapacityUnits: !Ref DefaultWriteCapacity
+
+  MessagesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: HydropassMessagesTable
+      KeySchema:
+        - AttributeName: channel_id
+          KeyType: HASH
+        - AttributeName: created_at
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: channel_id
+          AttributeType: S
+        - AttributeName: created_at
+          AttributeType: S
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref DefaultReadCapacity
+        WriteCapacityUnits: !Ref DefaultWriteCapacity
+
+Outputs:
+  UsersTable:
+    Value: !Ref UsersTable
+    Export:
+      Name: !Sub "${AWS::StackName}-UsersTable"
+  ListingsTable:
+    Value: !Ref ListingsTable
+    Export:
+      Name: !Sub "${AWS::StackName}-ListingsTable"
+  BookingsTable:
+    Value: !Ref BookingsTable
+    Export:
+      Name: !Sub "${AWS::StackName}-BookingsTable"
+  ReviewsTable:
+    Value: !Ref ReviewsTable
+    Export:
+      Name: !Sub "${AWS::StackName}-ReviewsTable"
+  ChannelsTable:
+    Value: !Ref ChannelsTable
+    Export:
+      Name: !Sub "${AWS::StackName}-ChannelsTable"
+  MessagesTable:
+    Value: !Ref MessagesTable
+    Export:
+      Name: !Sub "${AWS::StackName}-MessagesTable"

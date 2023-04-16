@@ -1,0 +1,5 @@
+version=0.1
+[default.local_invoke.parameters]
+container_host_interface = "0.0.0.0"
+[default.local_start_api.parameters]
+container_host_interface = "0.0.0.0"

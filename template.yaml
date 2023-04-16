@@ -1,0 +1,158 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  hydropass-sam-app
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  DynamoDBStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: templates/dynamo-template.yaml
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+
+  HydropassApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: hydropass-api
+      Description: Hydropass API
+      StageName: Prod
+      Cors:
+        AllowMethods: "'GET, PUT, POST, DELETE, OPTIONS'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
+
+  # Lambda Functions
+  rootFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/index.rootHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: HTTP get method to ping the Hydropass API
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+            RestApiId: !Ref HydropassApi
+  # User Lambda Functions
+  getAllUsersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/index.getAllUsersHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: HTTP get method to get all users from DynamoDB
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: HydropassUsersTable
+      Environment:
+        Variables:
+          USERS_TABLE: HydropassUsersTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: GET
+            RestApiId: !Ref HydropassApi
+  putUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/index.putUserHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: HTTP post method to add user to DynamoDB
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: HydropassUsersTable
+      Environment:
+        Variables:
+          USERS_TABLE: HydropassUsersTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: POST
+            RestApiId: !Ref HydropassApi
+  # Listing Lambda Functions
+  getAllListingsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/index.getAllListingsHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: HTTP get method to get all listings from DynamoDB
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: HydropassListingsTable
+      Environment:
+        Variables:
+          LISTINGS_TABLE: HydropassListingsTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /listings
+            Method: GET
+            RestApiId: !Ref HydropassApi
+  putListingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/index.putListingHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: HTTP post method to add listing to DynamoDB
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: HydropassListingsTable
+      Environment:
+        Variables:
+          LISTINGS_TABLE: HydropassListingsTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /listings
+            Method: POST
+            RestApiId: !Ref HydropassApi
+
+  # LambdaStack:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: s3://hydropass-sam-dev-bucket-01/hydropass-sam-app/lambda-template.yaml
+
+  ApplicationResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name: !Sub "ApplicationInsights-SAM-${AWS::StackName}"
+      ResourceQuery:
+        Type: CLOUDFORMATION_STACK_1_0
+  ApplicationInsightsMonitoring:
+    Type: AWS::ApplicationInsights::Application
+    Properties:
+      ResourceGroupName: !Sub "ApplicationInsights-SAM-${AWS::StackName}"
+      AutoConfigurationEnabled: "true"
+    DependsOn: ApplicationResourceGroup
+
+Outputs:
+  WebEndpoint:
+    Description: API Gateway endpoint URL for Prod stage
+    Value: !Sub "https://${HydropassApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
