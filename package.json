@@ -7,6 +7,8 @@
         "@aws-sdk/client-dynamodb": "^3.312.0",
         "@aws-sdk/lib-dynamodb": "^3.312.0",
         "aws-jwt-verify": "^4.0.0",
+        "aws-sdk": "^2.1361.0",
+        "image-type": "^5.2.0",
         "uuid": "^9.0.0"
     },
     "devDependencies": {

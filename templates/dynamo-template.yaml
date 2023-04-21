@@ -37,20 +37,6 @@ Resources:
           AttributeType: S
         - AttributeName: listing_id
           AttributeType: S
-        - AttributeName: location
-          AttributeType: S
-      GlobalSecondaryIndexes:
-        - IndexName: ListingLocationIndex
-          KeySchema:
-            - AttributeName: location
-              KeyType: HASH
-            - AttributeName: listing_id
-              KeyType: RANGE
-          Projection:
-            ProjectionType: ALL
-          ProvisionedThroughput:
-            ReadCapacityUnits: !Ref DefaultReadCapacity
-            WriteCapacityUnits: !Ref DefaultWriteCapacity
       ProvisionedThroughput:
         ReadCapacityUnits: !Ref DefaultReadCapacity
         WriteCapacityUnits: !Ref DefaultWriteCapacity

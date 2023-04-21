@@ -110,6 +110,29 @@ Resources:
             Path: /listings
             Method: GET
             RestApiId: !Ref HydropassApi
+  getUserListingsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/index.getMyListingsHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: HTTP get method to get authenticated user's listings from DynamoDB
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: HydropassListingsTable
+      Environment:
+        Variables:
+          LISTINGS_TABLE: HydropassListingsTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /me/listings
+            Method: GET
+            RestApiId: !Ref HydropassApi
   putListingFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -123,9 +146,12 @@ Resources:
       Policies:
         - DynamoDBWritePolicy:
             TableName: HydropassListingsTable
+        - S3FullAccessPolicy:
+            BucketName: hydropass-listing-images
       Environment:
         Variables:
           LISTINGS_TABLE: HydropassListingsTable
+          S3_BUCKET_NAME: hydropass-listing-images
       Events:
         Api:
           Type: Api
