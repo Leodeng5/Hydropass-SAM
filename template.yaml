@@ -110,6 +110,29 @@ Resources:
             Path: /listings
             Method: GET
             RestApiId: !Ref HydropassApi
+  getListingByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/index.getListingByIdHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: HTTP get method to get the specified listing from DynamoDB
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: HydropassListingsTable
+      Environment:
+        Variables:
+          LISTINGS_TABLE: HydropassListingsTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /listings/{id}
+            Method: GET
+            RestApiId: !Ref HydropassApi
   getFeaturedListingsFunction:
     Type: AWS::Serverless::Function
     Properties:

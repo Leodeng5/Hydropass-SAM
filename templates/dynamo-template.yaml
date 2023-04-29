@@ -51,6 +51,15 @@ Resources:
           ProvisionedThroughput:
             ReadCapacityUnits: !Ref DefaultReadCapacity
             WriteCapacityUnits: !Ref DefaultWriteCapacity
+        - IndexName: ListingIdIndex
+          KeySchema:
+            - AttributeName: listing_id
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: !Ref DefaultReadCapacity
+            WriteCapacityUnits: !Ref DefaultWriteCapacity
       ProvisionedThroughput:
         ReadCapacityUnits: !Ref DefaultReadCapacity
         WriteCapacityUnits: !Ref DefaultWriteCapacity
