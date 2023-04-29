@@ -4,6 +4,7 @@ import { getAllUsers } from "./users/get-all-users.mjs";
 import { putUser } from "./users/put-user.mjs";
 import { putListing } from "./listings/put-listing.mjs";
 import { getAllListings } from "./listings/get-all-listings.mjs";
+import { getListingById } from "./listings/get-listing-by-id.mjs";
 import { getMyListings } from "./listings/get-my-listings.mjs";
 import { getFeaturedListings } from "./listings/get-featured-listings.mjs";
 
@@ -12,5 +13,6 @@ export const getAllUsersHandler = addCorsHeader(getAllUsers);
 export const putUserHandler = addCorsHeader(putUser);
 export const putListingHandler = addCorsHeader(putListing);
 export const getAllListingsHandler = addCorsHeader(getAllListings);
+export const getListingByIdHandler = addCorsHeader(getListingById);
 export const getMyListingsHandler = addCorsHeader(getMyListings);
 export const getFeaturedListingsHandler = addCorsHeader(getFeaturedListings);
