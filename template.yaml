@@ -197,7 +197,6 @@ Resources:
       Environment:
         Variables:
           LISTINGS_TABLE: HydropassListingsTable
-          S3_BUCKET_NAME: hydropass-listing-images
       Events:
         Api:
           Type: Api
