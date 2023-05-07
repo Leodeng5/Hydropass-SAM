@@ -63,6 +63,29 @@ Resources:
             Path: /users
             Method: GET
             RestApiId: !Ref HydropassApi
+  getUserByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/index.getUserByIdHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: HTTP get method to get user by id
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: HydropassUsersTable
+      Environment:
+        Variables:
+          USERS_TABLE: HydropassUsersTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /users/{id}
+            Method: GET
+            RestApiId: !Ref HydropassApi
   putUserFunction:
     Type: AWS::Serverless::Function
     Properties:
