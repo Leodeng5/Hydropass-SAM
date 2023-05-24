@@ -1,0 +1,121 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  WebSocketAPI:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: HydropassWebSocketAPI
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.action"
+
+  WebSocketStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: dev
+      ApiId: !Ref WebSocketAPI
+      AutoDeploy: true
+
+  ConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      RouteKey: "$connect"
+      ApiId: !Ref WebSocketAPI
+      OperationName: ConnectRoute
+      Target: !Sub integrations/${ConnectIntegration}
+  ConnectIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketAPI
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectFunction.Arn}/invocations
+  ConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../src/handlers/web-socket/
+      Handler: index.connectHandler
+      Runtime: nodejs18.x
+      Policies:
+        - AmazonAPIGatewayInvokeFullAccess
+        - DynamoDBWritePolicy:
+            TableName: HydropassConnectionsTable
+      Environment:
+        Variables:
+          CONNECTIONS_TABLE: HydropassConnectionsTable
+  ConnectFunctionInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ConnectFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketAPI}/*"
+
+  DisconnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      RouteKey: "$disconnect"
+      ApiId: !Ref WebSocketAPI
+      OperationName: DisconnectRoute
+      Target: !Sub integrations/${DisconnectIntegration}
+  DisconnectIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketAPI
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DisconnectFunction.Arn}/invocations
+  DisconnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../src/handlers/web-socket/
+      Handler: index.disconnectHandler
+      Runtime: nodejs18.x
+      Policies:
+        - AmazonAPIGatewayInvokeFullAccess
+        - DynamoDBCrudPolicy:
+            TableName: HydropassConnectionsTable
+      Environment:
+        Variables:
+          CONNECTIONS_TABLE: HydropassConnectionsTable
+  DisconnectFunctionInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref DisconnectFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketAPI}/*"
+
+  SendMessageRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      RouteKey: sendMessage
+      ApiId: !Ref WebSocketAPI
+      OperationName: SendMessageRoute
+      Target: !Sub integrations/${SendMessageIntegration}
+  SendMessageIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketAPI
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SendMessageFunction.Arn}/invocations
+  SendMessageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../src/handlers/web-socket/
+      Handler: index.sendMessageHandler
+      Runtime: nodejs18.x
+      Policies:
+        - AmazonAPIGatewayInvokeFullAccess
+        - DynamoDBWritePolicy:
+            TableName: HydropassMessagesTable
+        - DynamoDBReadPolicy:
+            TableName: HydropassConnectionsTable
+      Environment:
+        Variables:
+          MESSAGES_TABLE: HydropassMessagesTable
+          CONNECTIONS_TABLE: HydropassConnectionsTable
+  SendMessageFunctionInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SendMessageFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketAPI}/*"

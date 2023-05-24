@@ -130,20 +130,30 @@ Resources:
         ReadCapacityUnits: !Ref DefaultReadCapacity
         WriteCapacityUnits: !Ref DefaultWriteCapacity
 
-  ChannelsTable:
+  ConnectionsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: HydropassChannelsTable
+      TableName: HydropassConnectionsTable
       KeySchema:
-        - AttributeName: listing_id
+        - AttributeName: user_id
           KeyType: HASH
-        - AttributeName: channel_id
+        - AttributeName: connection_id
           KeyType: RANGE
       AttributeDefinitions:
-        - AttributeName: listing_id
+        - AttributeName: user_id
           AttributeType: S
-        - AttributeName: channel_id
+        - AttributeName: connection_id
           AttributeType: S
+      GlobalSecondaryIndexes:
+        - IndexName: ConnectionIdIndex
+          KeySchema:
+            - AttributeName: connection_id
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: !Ref DefaultReadCapacity
+            WriteCapacityUnits: !Ref DefaultWriteCapacity
       ProvisionedThroughput:
         ReadCapacityUnits: !Ref DefaultReadCapacity
         WriteCapacityUnits: !Ref DefaultWriteCapacity
@@ -153,19 +163,18 @@ Resources:
     Properties:
       TableName: HydropassMessagesTable
       KeySchema:
-        - AttributeName: channel_id
+        - AttributeName: sender_id
           KeyType: HASH
         - AttributeName: created_at
           KeyType: RANGE
       AttributeDefinitions:
-        - AttributeName: channel_id
+        - AttributeName: sender_id
           AttributeType: S
         - AttributeName: created_at
-          AttributeType: S
+          AttributeType: N
       ProvisionedThroughput:
         ReadCapacityUnits: !Ref DefaultReadCapacity
         WriteCapacityUnits: !Ref DefaultWriteCapacity
-
 Outputs:
   UsersTable:
     Value: !Ref UsersTable
@@ -183,10 +192,10 @@ Outputs:
     Value: !Ref ReviewsTable
     Export:
       Name: !Sub "${AWS::StackName}-ReviewsTable"
-  ChannelsTable:
-    Value: !Ref ChannelsTable
+  ConnectionsTable:
+    Value: !Ref ConnectionsTable
     Export:
-      Name: !Sub "${AWS::StackName}-ChannelsTable"
+      Name: !Sub "${AWS::StackName}-ConnectionsTable"
   MessagesTable:
     Value: !Ref MessagesTable
     Export:

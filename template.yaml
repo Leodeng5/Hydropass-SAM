@@ -3,6 +3,13 @@ Description: >-
   hydropass-sam-app
 Transform: AWS::Serverless-2016-10-31
 Resources:
+  WebSocketStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: templates/websocket-template.yaml
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+
   DynamoDBStack:
     Type: AWS::Serverless::Application
     Properties:
