@@ -8,6 +8,7 @@ import { getAllListings } from "./listings/get-all-listings.mjs";
 import { getListingById } from "./listings/get-listing-by-id.mjs";
 import { getMyListings } from "./listings/get-my-listings.mjs";
 import { getFeaturedListings } from "./listings/get-featured-listings.mjs";
+import { getMyMessages } from "./messages/get-my-messages.mjs";
 
 export const rootHandler = addCorsHeader(rootFunction);
 export const getAllUsersHandler = addCorsHeader(getAllUsers);
@@ -18,3 +19,4 @@ export const getAllListingsHandler = addCorsHeader(getAllListings);
 export const getListingByIdHandler = addCorsHeader(getListingById);
 export const getMyListingsHandler = addCorsHeader(getMyListings);
 export const getFeaturedListingsHandler = addCorsHeader(getFeaturedListings);
+export const getMyMessagesHandler = addCorsHeader(getMyMessages);

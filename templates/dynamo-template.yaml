@@ -170,8 +170,22 @@ Resources:
       AttributeDefinitions:
         - AttributeName: sender_id
           AttributeType: S
+        - AttributeName: recipient_id
+          AttributeType: S
         - AttributeName: created_at
           AttributeType: N
+      GlobalSecondaryIndexes:
+        - IndexName: RecipientIdIndex
+          KeySchema:
+            - AttributeName: recipient_id
+              KeyType: HASH
+            - AttributeName: created_at
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: !Ref DefaultReadCapacity
+            WriteCapacityUnits: !Ref DefaultWriteCapacity
       ProvisionedThroughput:
         ReadCapacityUnits: !Ref DefaultReadCapacity
         WriteCapacityUnits: !Ref DefaultWriteCapacity

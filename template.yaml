@@ -46,6 +46,7 @@ Resources:
             Path: /
             Method: GET
             RestApiId: !Ref HydropassApi
+
   # User Lambda Functions
   getAllUsersFunction:
     Type: AWS::Serverless::Function
@@ -116,6 +117,7 @@ Resources:
             Path: /users
             Method: POST
             RestApiId: !Ref HydropassApi
+
   # Listing Lambda Functions
   getAllListingsFunction:
     Type: AWS::Serverless::Function
@@ -233,6 +235,34 @@ Resources:
           Properties:
             Path: /listings
             Method: POST
+            RestApiId: !Ref HydropassApi
+
+  # Message Lambda Functions
+  getUserMessagesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/index.getMyMessagesHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: HTTP get method to get authenticated user's message history from DynamoDB
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: HydropassMessagesTable
+        - DynamoDBReadPolicy:
+            TableName: HydropassUsersTable
+      Environment:
+        Variables:
+          MESSAGES_TABLE: HydropassMessagesTable
+          USERS_TABLE: HydropassUsersTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /me/messages
+            Method: GET
             RestApiId: !Ref HydropassApi
 
   # LambdaStack:
