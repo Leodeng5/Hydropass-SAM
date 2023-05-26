@@ -85,7 +85,7 @@ export const getMyMessages = async (event) => {
         channel.messageHistory.push({
           sender_id: message.sender_id,
           text: message.text,
-          created_at: message.created_at,
+          timestamp: message.created_at,
         });
         channel.last_message = message.created_at;
       } else {
